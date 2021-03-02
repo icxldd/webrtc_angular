@@ -11,10 +11,10 @@ export class RoomComponent implements OnInit {
 
 
 
-  roomId:string;
-  userName:string;
-  chatSocket:any;
-  mediaConstraints = {"audio": true,"video": true};
+  roomId: string;
+  userName: string;
+  chatSocket: any;
+  mediaConstraints = { "audio": true, "video": true };
 
 
   localStream = null;
@@ -22,22 +22,22 @@ export class RoomComponent implements OnInit {
   peerList = {};
 
   //自己
-  @ViewChild('videoMine') videoMine_:ElementRef;
+  @ViewChild('videoMine') videoMine_: ElementRef;
   //别人
-  @ViewChild('videoBox') videoBox_:ElementRef;
-  
-  videoBox:any;
-  localVideo:any;
+  @ViewChild('videoBox') videoBox_: ElementRef;
+
+  videoBox: any;
+  localVideo: any;
 
 
   constructor(private route: ActivatedRoute) {
     // this.roomId = '1';
     // this.userName = 'icxl';
-    this.route.queryParams.subscribe(x=>{
-     let itemObj =x;
-     this.roomId = itemObj.roomId;
-     this.userName = itemObj.userName;
-   });
+    this.route.queryParams.subscribe(x => {
+      let itemObj = x;
+      this.roomId = itemObj.roomId;
+      this.userName = itemObj.userName;
+    });
   }
   ngOnInit(): void {
 
@@ -45,8 +45,15 @@ export class RoomComponent implements OnInit {
 
 
 
-  getPeerConnection(v:any){
-    let iceServer:any = {
+  sendHeart() {
+    setInterval(() => {
+      let heartEvent = { type: 'heart', roomid: this.roomId };
+      this.chatSocket.send(JSON.stringify(heartEvent));
+    }, 10000);
+  }
+
+  getPeerConnection(v: any) {
+    let iceServer: any = {
       "iceServers": [
         {
           "url": "stun:stun.l.google.com:19302"
@@ -54,22 +61,22 @@ export class RoomComponent implements OnInit {
       ]
     };
 
-   
-    var peer:any = new RTCPeerConnection(iceServer);
+
+    var peer: any = new RTCPeerConnection(iceServer);
     peer.addStream(this.localStream);
 
     var hasAddTrack = (peer.addTrack !== undefined);
 
-    if(hasAddTrack){
+    if (hasAddTrack) {
       peer.ontrack = (event) => {
-        let videos:any ;
+        let videos: any;
         try {
-        videos = document.getElementById(v.account);
-        }catch(e){}
+          videos = document.getElementById(v.account);
+        } catch (e) { }
         if (videos) {
           videos.srcObject = event.streams[0];
         } else {
-          let video:any = document.createElement('video');
+          let video: any = document.createElement('video');
           video.controls = true;
           video.autoplay = 'autoplay';
           video.srcObject = event.streams[0];
@@ -80,14 +87,14 @@ export class RoomComponent implements OnInit {
     }
     else {
       peer.onaddstream = (event) => {
-        let videos:any ;
+        let videos: any;
         try {
           videos = document.getElementById(v.account);
-        }catch(e){}
+        } catch (e) { }
         if (videos) {
           videos.srcObject = event.stream;
         } else {
-          let video:any = document.createElement('video');
+          let video: any = document.createElement('video');
           video.controls = true;
           video.autoplay = 'autoplay';
           video.srcObject = event.stream;
@@ -97,7 +104,7 @@ export class RoomComponent implements OnInit {
       };
     }
 
-  peer.onicecandidate = (event) => {
+    peer.onicecandidate = (event) => {
       if (event.candidate) {
         this.sendMessage({
           type: '__ice_candidate',
@@ -106,37 +113,35 @@ export class RoomComponent implements OnInit {
         });
       }
     };
-  this.peerList[v.account] = peer;
+    this.peerList[v.account] = peer;
   }
 
-  userJoined(data, account){
-    if (data.length> 1) {//房间內有人进行peer初始化操作
+  userJoined(data, account) {
+    if (data.length > 1) {//房间內有人进行peer初始化操作
       data.forEach(v => {
-        let obj:any = {};
+        let obj: any = {};
         let arr = [v, this.userName];
         obj.account = arr.sort().join('-');
         // this.debugPrint(obj.account);
-        if(!this.peerList[obj.account]&&v!==this.userName){
+        if (!this.peerList[obj.account] && v !== this.userName) {
           this.getPeerConnection(obj);
         }
       });
 
       // 自己进来给房间其它人发offer
-    if (account === this.userName) {
-      
-      for (let k in this.peerList) {
-        this.createOffer(k, this.peerList[k]);
+      if (account === this.userName) {
+        for (let k in this.peerList) {
+          this.createOffer(k, this.peerList[k]);
+        }
       }
     }
-
   }
-  }
-  debugPrint(str){
+  debugPrint(str) {
     console.log(str);
   }
 
-  
-  createOffer(account:any,peer:any){
+
+  createOffer(account: any, peer: any) {
     //发送offer，发送本地session描述
     peer.createOffer({
       offerToReceiveAudio: 1,
@@ -150,70 +155,77 @@ export class RoomComponent implements OnInit {
         });
       });
     });
-    }
+  }
   handleVideoOfferMsg(v) {
     this.peerList[v.account] && this.peerList[v.account].setRemoteDescription(v.sdp, () => {
       this.peerList[v.account].createAnswer().then((desc) => {
-          this.peerList[v.account].setLocalDescription(desc, () => {
-            this.sendMessage({
-              type: 'video-answer',
-              sdp: this.peerList[v.account].localDescription,
-              account: v.account
-            });
+        this.peerList[v.account].setLocalDescription(desc, () => {
+          this.sendMessage({
+            type: 'video-answer',
+            sdp: this.peerList[v.account].localDescription,
+            account: v.account
           });
+        });
       });
-    }, () => {});
+    }, () => { });
   }
 
-  initRoomSignalling(){
+  initRoomSignalling() {
     // this.chatSocket = new ReconnectingWebSocket('wss://192.168.31.114:3000');
     this.chatSocket = new ReconnectingWebSocket(environment.WebSocketUrl);
-    
+
+
+
+
     let self = this;
 
 
-    this.chatSocket.onmessage = function(evt) {
-      var msg = JSON.parse(evt.data);
-      console.log(msg);
+    this.chatSocket.onmessage = function (evt) {
+      if (evt.data == '1') {
+        return;
+      } else {
+        var msg = JSON.parse(evt.data);
+        console.log(msg);
 
-      switch(msg.type) {
-        case "joined":
-          self.userJoined(msg.userList, msg.userName);
-          break;
-        case "__ice_candidate":
-           //如果是一个ICE的候选，则将其加入到PeerConnection中
-          if (msg.candidate) {
-            self.peerList[msg.account] && self.peerList[msg.account].addIceCandidate(msg.candidate).catch(() => {}
-            );
-          }
-          break;
-        case "error":
-          alert(msg.msg);
-          break;
-        // case "text":
-        //   break;
-        // 信令消息:这些消息用于在视频通话之前的谈判期间交换WebRTC信令信息。
-        case "video-offer":  // 发送 offer
-        self.handleVideoOfferMsg(msg);
-          break;
-        case "video-answer":  // Callee已经答复了我们的报价
-        self.peerList[msg.account] && self.peerList[msg.account].setRemoteDescription(msg.sdp, function(){}, () => {});
-          break;
-        case "disconnected": // 有人挂断了电话
-          console.log(msg.account);
-          let dom = document.getElementById([msg.account, self.userName].sort().join('-'));
-          if (dom) {
-            dom.remove();
-          }
-          break;
-        // 未知的信息;输出到控制台进行调试。
-        default:
-          console.log("未知的信息收到了:");
-          console.log(msg);
+        switch (msg.type) {
+          case "joined":
+            self.userJoined(msg.userList, msg.userName);
+            break;
+          case "__ice_candidate":
+            //如果是一个ICE的候选，则将其加入到PeerConnection中
+            if (msg.candidate) {
+              self.peerList[msg.account] && self.peerList[msg.account].addIceCandidate(msg.candidate).catch(() => { }
+              );
+            }
+            break;
+          case "error":
+            alert(msg.msg);
+            break;
+          // case "text":
+          //   break;
+          // 信令消息:这些消息用于在视频通话之前的谈判期间交换WebRTC信令信息。
+          case "video-offer":  // 发送 offer
+            self.handleVideoOfferMsg(msg);
+            break;
+          case "video-answer":  // Callee已经答复了我们的报价
+            self.peerList[msg.account] && self.peerList[msg.account].setRemoteDescription(msg.sdp, function () { }, () => { });
+            break;
+          case "disconnected": // 有人挂断了电话
+            console.log(msg.account);
+            let dom = document.getElementById([msg.account, self.userName].sort().join('-'));
+            if (dom) {
+              dom.remove();
+            }
+            break;
+          // 未知的信息;输出到控制台进行调试。
+          default:
+            console.log("未知的信息收到了:");
+            console.log(msg);
+        }
       }
     };
 
-      //连接成功建立的回调方法
+    //连接成功建立的回调方法
     this.chatSocket.onopen = function (event) {
       console.log("onopen");
     }
@@ -230,6 +242,8 @@ export class RoomComponent implements OnInit {
       self.chatSocket.close();
     }
 
+
+    this.sendHeart();
   }
 
   sendMessage(msg) {
@@ -237,7 +251,7 @@ export class RoomComponent implements OnInit {
     this.chatSocket.send(JSON.stringify(msg));
   }
 
-  async initlocalhostStream(){
+  async initlocalhostStream() {
 
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia(this.mediaConstraints);
@@ -247,12 +261,12 @@ export class RoomComponent implements OnInit {
         type: 'join'
       });
     } catch (error) {
-      console.log('获取本地摄像头失败：'+error);
+      console.log('获取本地摄像头失败：' + error);
     }
   }
 
   ngAfterViewInit() {
-    this.videoBox= this.videoBox_.nativeElement;
+    this.videoBox = this.videoBox_.nativeElement;
     this.localVideo = this.videoMine_.nativeElement;
 
     this.initRoomSignalling();

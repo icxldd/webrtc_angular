@@ -5,8 +5,8 @@
 export const environment = {
     production: false,
     APIServer: 'https://d-xcloud-gateway.cxist.cn/web',
-    // WebSocketUrl:'wss://192.168.31.114:3000'
-    WebSocketUrl:'wss://church.yangqungongshe.com:3000'
+    WebSocketUrl:'wss://192.168.31.114:3000'
+    // WebSocketUrl:'wss://church.yangqungongshe.com:3000'
 
     
 };
