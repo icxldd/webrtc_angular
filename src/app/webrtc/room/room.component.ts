@@ -44,7 +44,7 @@ export class RoomComponent implements OnInit {
   }
 
 
-
+/*sudo docker run -d -p 3478:3478 -p 3478:3478/udp --restart=always zolochevska/turn-server username password realm */
   sendHeart() {
     setInterval(() => {
       let heartEvent = { type: 'heart', roomid: this.roomId };
@@ -56,8 +56,10 @@ export class RoomComponent implements OnInit {
     let iceServer: any = {
       "iceServers": [
         {
-          "url": "stun:stun.l.google.com:19302"
-        }
+          'urls': 'turn:121.5.78.63:3478',
+          'credential': "password",
+          'username': "username"
+        },
       ]
     };
 
