@@ -1,0 +1,14 @@
+<h3>用户登录</h3>
+<form [formGroup]='form'>
+    <div class="item">
+        <label>用户名</label>
+        <input type="text" formControlName='username'>
+    </div>
+    <div class="item">
+        <label>密码</label>
+        <input type="password" formControlName='password'>
+    </div>
+    <div class="item">
+        <button (click)='login()'>登录</button>
+    </div>
+</form>

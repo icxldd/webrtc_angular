@@ -1,0 +1,23 @@
+<div style="padding: 15px 0">
+  <WingBlank style="margin-bottom: 20px;">
+    <p style="text-align: center;">{{userName}}。欢迎来到羊群公社聊天室：{{roomId}}</p>
+  </WingBlank>
+
+  <!-- 自己 -->
+  <WingBlank style="margin-bottom: 20px;">
+    <p>自己：</p>
+    <video autoplay controls #videoMine></video>
+  </WingBlank>
+
+
+  <!-- 别人 -->
+  <WingBlank style="margin-bottom: 20px;">
+    <p>远程：</p>
+    <div #videoBox>
+      <!-- <video autoplay controls></video>
+      <video autoplay controls></video>
+      <video autoplay controls></video> -->
+    </div>
+    
+  </WingBlank>
+</div>

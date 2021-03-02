@@ -1,0 +1,25 @@
+<div style="padding: 15px 0">
+  <WingBlank style="margin-bottom: 20px;">
+    <p style="text-align: center;">欢迎来到羊群公社聊天室</p>
+  </WingBlank>
+  <WingBlank>
+    <div class="am-list" style="margin:0;">
+      <div class="am-list-header" style="padding-left: 0px !important;">房间基本信息：</div>
+      <div class="am-list-body">
+        <InputItem [clear]="true" #userNameInput [placeholder]="'请输入名称'" [content]="'请输入名称：'"></InputItem>
+        <InputItem #roomInput
+          [type]="'money'"
+          [clear]="true"
+          [placeholder]="'请输入房间号'"
+          [moneyKeyboardAlign]="'left'"
+          [content]="'请输入房间号：'"
+        >
+        </InputItem>
+      </div>
+    </div>
+  </WingBlank>
+  
+  <WingBlank style="margin-top: 20px;">
+    <div Button [type]="'primary'" (click)="joinRoom();">进入房间</div>
+  </WingBlank>
+</div>

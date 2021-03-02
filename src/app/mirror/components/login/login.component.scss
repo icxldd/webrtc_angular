@@ -1,0 +1,59 @@
+:host {
+    display: block;
+    padding: 2em;
+
+    h3 {
+        margin-bottom: 1em;
+    }
+
+    form {
+        display: block;
+
+        div.item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+
+            label {
+                display: block;
+                width: 80px;
+
+                &::after {
+                    content: ':';
+                }
+
+            }
+
+            input {
+                height: 2.625rem;
+                border: 1px solid #d8dde6;
+                border-radius: 0.25rem;
+                padding: 0 0.75rem;
+                font-size: 1.125rem;
+                background-color: white;
+
+                &:focus {
+                    background-color: #ffffff;
+                    border: 1px solid #1589ee;
+                    outline: 0;
+                    box-shadow: 0 0 0.1875rem #0070d2;
+                }
+            }
+
+            button {
+                height: 2.625rem;
+                border: 1px solid transparent;
+                border-radius: 0.25rem;
+                margin-left: 80px;
+                padding: 0 1.2em;
+                background-color: #1c7ec3;
+                color: white;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: #0070d2;
+                }
+            }
+        }
+    }
+}

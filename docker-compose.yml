@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+
+  angular-ssr-app:
+    image: registry.cn-hangzhou.aliyuncs.com/yqgs-pu/webrtc-web:0226
+    build:
+      context: .
+      dockerfile: image/Dockerfile
